@@ -1,0 +1,26 @@
+import { Router } from "express";
+import { isAuthenticated } from "../../middlwares/authentication.middleWare.js";
+import { isAuthorized } from "../../middlwares/authorization.middleWare.js";
+import { validation } from "../../middlwares/validation.middlware.js";
+import * as orderSchema from "../../modules/order/order.schema.js"
+import * as orderController from "../../modules/order/order.controller.js"
+const router = Router()
+
+// create order 
+router.post("/",isAuthenticated, 
+    isAuthorized("user"), 
+    validation(orderSchema.createOrder),
+    orderController.createOrder
+);
+// cancel order 
+router.patch("/:id",isAuthenticated, 
+    isAuthorized("user"), 
+    validation(orderSchema.cancelOrder),
+    orderController.cancelOrder
+);
+
+
+
+
+
+export default router

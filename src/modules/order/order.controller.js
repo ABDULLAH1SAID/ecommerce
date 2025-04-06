@@ -160,6 +160,7 @@ export const cancelsOrder = asyncHandler(async(req, res, next)=>{
 export const webhookHandler = asyncHandler(async(req, res, next)=>{
     const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
     const sig = req.headers['stripe-signature'];
+    console.log(sig)
     const endpointSecret = process.env.ENDPOINT_SECRET
     let event; 
     try {
@@ -170,12 +171,14 @@ export const webhookHandler = asyncHandler(async(req, res, next)=>{
     }
     if(event.type === 'checkout.session.completed') {
         // change order status   
-     
+        console.log("Checkout session completed event received");
+
        const orderId = event.data.object.metadata.order_id
        await Order.updateOne(
             {_id: orderId},
             {status: "visa paid"}
         )
+        console.log("visa paid")
         return;
     }
     else {

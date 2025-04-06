@@ -140,7 +140,7 @@ export const createOrder = asyncHandler(async(req, res, next)=>{
     return res.json({success:true, results:{ order } })
 })
 
-export const cancelOrder = asyncHandler(async(req, res, next)=>{
+export const cancelsOrder = asyncHandler(async(req, res, next)=>{
     const order = await Order.findById(req.params.id);
     if (!order) return next(new Error("Invalid order id!", { cause: 400 }));
     

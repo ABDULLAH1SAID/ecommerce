@@ -47,7 +47,12 @@ await connectDB()
 app.use(cors()) // all access from every where
 
 app.use(morgan('combined')) // for logging requests
-app.use(express.json())
+app.use((req, res, next)=>{
+    if(req.originalUrl==='/order/webhook'){
+        return next()
+    }
+    express.json()(req, res, next);
+})
 
 const __dirname = path.resolve();
 app.use(express.static(path.join(__dirname, 'public')));

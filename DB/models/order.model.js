@@ -19,7 +19,10 @@ const orderSchema = new Schema({
         name: String,
         discount: {type: Number, min: 1, max: 100}
     },
-status: {type: String, default: "placed", enum: ["placed", "shipped", "delivered", "cancelled", "refunded"]}
+    status: {type: String, default: "placed", enum: ["placed", "shipped",
+         "delivered","cancelled",
+          "refunded","visa paid",
+          "failed to pay"]}
 },{ timestamps:true});
 
 

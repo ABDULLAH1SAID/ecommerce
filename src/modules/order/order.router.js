@@ -16,11 +16,9 @@ router.post("/",isAuthenticated,
 router.patch("/:id",isAuthenticated, 
     isAuthorized("user"), 
     validation(orderSchema.cancelOrder),
-    orderController.cancelOrder
+    orderController.cancelsOrder
 );
 
-
-
-
+router.post('/webhook', express.json({type: 'application/json'}), orderController.webhookHandler)
 
 export default router

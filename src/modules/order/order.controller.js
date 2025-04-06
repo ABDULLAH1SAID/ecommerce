@@ -115,6 +115,7 @@ export const createOrder = asyncHandler(async(req, res, next)=>{
         const session = await stripe.checkout.sessions.create({
             payment_method_types: ['card'],
             mode:'payment',
+            metadata:{order_id:order._id.toString()},
             success_url:`${req.protocol}://${req.headers.host}/example.html`, 
             cancel_url:`${req.protocol}://${req.headers.host}/example2.html`,
             line_items: order.products.map((item)=>{
@@ -155,3 +156,34 @@ export const cancelOrder = asyncHandler(async(req, res, next)=>{
     return res.json({ success:true, message:" Order canceled !"})
 })
 
+
+export const webhookHandler = asyncHandler(async(req, res, next)=>{
+    const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
+    const sig = req.headers['stripe-signature'];
+    const endpointSecret = process.env.ENDPOINT_SECRET
+    let event; 
+    try {
+        event = stripe.webhooks.constructEvent(req.body, sig, endpointSecret)
+        console.log(event)
+    } catch (error) {
+        return res.status(400).send(`Webhook Error: ${error.message}`)
+    }
+    if(event.type === 'checkout.session.completed') {
+        // change order status   
+     
+       const orderId = event.data.object.metadata.order_id
+       await Order.updateOne(
+            {_id: orderId},
+            {status: "visa paid"}
+        )
+        return;
+    }
+    else {
+       const orderId = event.data.object.metadata.order_id
+       await Order.updateOne(
+            {_id: orderId},
+            {status: "failed to pay"}
+        )
+        return;
+    }
+})
